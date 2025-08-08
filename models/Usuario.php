@@ -10,24 +10,16 @@ class Usuario { // <-- Corrigido aqui!
     public $senha;
 
     public function __construct() {
-        $database = new Database();
-        $this->conn = $database->getConnection();  
+        $this->conn = Conexao::conectar();
         
     }
 
-   public function cadastrar($nome, $email, $senha) {
-    $sql = "INSERT INTO usuarios (nome, email, senha) VALUES (:nome, :email, :senha)";
-    $stmt = $this->conn->prepare($sql); 
-                
-    // Hash da senha antes de salvar
-    $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
-
-    $stmt->bindParam(':nome', $nome);
-    $stmt->bindParam(':email', $email);
-    $stmt->bindParam(':senha', $senhaHash);
-
-    return $stmt->execute();
-}
+    public function cadastrar() {
+        $sql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
+        $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+        return $stmt->execute([$nome, $email, $senhaHash]);
+    }
 
     public function autenticar($email, $senha) {
         $sql = "SELECT * FROM usuarios WHERE email = ?";
@@ -60,6 +52,7 @@ class Usuario { // <-- Corrigido aqui!
         return $stmt->execute([$senhaHash, $email]);
     }
 
+<<<<<<< HEAD
     public function buscarPorId($id) {
         $sql = "SELECT * FROM usuarios WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
@@ -93,3 +86,29 @@ class Usuario { // <-- Corrigido aqui!
     }
 }
 
+=======
+    // Método para atualizar um usuário sem apagar a imagem existente
+    public function update() {
+        $query = "UPDATE usuarios SET nome = :nome, email = :email, senha";
+    
+        if (!empty($this->imagem)) {
+            $query .= ", imagem = :imagem";
+        }
+    
+        $query .= " WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+    
+        $stmt->bindParam(':nome', $this->nome);
+        $stmt->bindParam(':email', $this->email);
+        $stmt->bindParam(':senha', $this->senha);
+        
+        if (!empty($this->imagem)) {
+            $stmt->bindParam(':imagem', $this->imagem);
+        }
+    
+        $stmt->bindParam(':id', $this->id);
+    
+        return $stmt->execute();
+    }
+}
+>>>>>>> parent of 44708da (Merge pull request #9 from camilla-ggoncalves/alteracoes-guilherme)
